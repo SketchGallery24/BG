@@ -1,0 +1,69 @@
+1) Pallin.java 
+import java.rmi.*;  
+public interface Pallin extends Remote{  
+public boolean pallindrome(String s)throws RemoteException;  
+}  
+2) Pallin Remote 
+import java.util.Scanner;  
+import java.rmi.*;  
+import java.rmi.server.*;  
+public class PallinRemote extends UnicastRemoteObject implements Pallin  
+{  
+PallinRemote()throws RemoteException  
+{  
+super();  
+}  
+public boolean pallindrome(String s)  
+{  
+String a, b = "";  
+boolean status = false;  
+a=s;  
+int n = a.length();  
+for(int i = n - 1; i >= 0; i--)  
+{  
+b = b + a.charAt(i);  
+}  
+if(a.equalsIgnoreCase(b))  
+{  
+return true;  
+}  
+else  
+{  
+return false;  
+}  
+}  
+}  
+3) MyServer.java 
+import java.rmi.registry.*;  
+public class MyServer {  
+public static void main(String args[]) {  
+try {  
+System.setProperty("java.rmi.server.hostname", "localhost");  
+Pallin stub = new PallinRemote();  
+Registry registry = LocateRegistry.createRegistry(1099); // start internal registry  
+registry.rebind("PAL", stub);  
+System.out.println("Server Started");  
+} catch (Exception e) {  
+e.printStackTrace();  
+} } }  
+4) MyClient.java 
+import java.util.Scanner;  
+import java.rmi.*;  
+public class MyClient{  
+public static void main(String args[]){  
+try{  
+Pallin stub=(Pallin)Naming.lookup("PAL");  
+Scanner s = new Scanner(System.in);  
+System.out.println("Enter the string you want to check:");  
+String a = s.nextLine();  
+if (stub.pallindrome(a)==true)  
+{  
+System.out.println(" The given string is Pallindrome");  
+}  
+else  
+{  
+System.out.println(" The given string is not Pallindrome");  
+}  
+}catch(Exception e){}  
+}  
+}  
