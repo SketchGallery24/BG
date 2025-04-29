@@ -1,0 +1,74 @@
+1)Login.jsp; 
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+<meta charset="UTF-8"> 
+<title>Login Page</title> 
+</head> 
+<body> 
+<h2>Login Form</h2> 
+<form action="LoginServlet" method="post"> 
+<label>Username: </label> 
+<input type="text" name="username" required><br><br> 
+<label>Password: </label> 
+<input type="password" name="password" required><br><br> 
+<input type="submit" value="Login"> 
+</form> 
+</body> 
+</html> 
+2) LoginServlet.java 
+package yourpackage; 
+import java.io.*; 
+import javax.servlet.*; 
+import javax.servlet.http.*; 
+import javax.servlet.annotation.*; 
+@WebServlet("/LoginServlet") 
+public class LoginServlet extends HttpServlet { 
+protected void doPost(HttpServletRequest request, HttpServletResponse response)  
+throws ServletException, IOException { 
+String username = request.getParameter("username"); 
+String password = request.getParameter("password"); 
+UserDAO userDAO = new UserDAO(); 
+String dbPassword = userDAO.getPasswordByUsername(username); 
+response.setContentType("text/html"); 
+PrintWriter out = response.getWriter(); 
+if (dbPassword == null) { 
+out.println("<h3>User Not Registered</h3>"); 
+} else if (dbPassword.equals(password)) { 
+out.println("<h3>Username & Password Matched</h3>"); 
+} else { 
+out.println("<h3>Username & Password Incorrect</h3>"); 
+} 
+}} 
+3)UserDAO.java: 
+package yourpackage; 
+import java.sql.*; 
+public class UserDAO { 
+public String getPasswordByUsername(String username) { 
+String password = null; 
+try { 
+Class.forName("com.mysql.cj.jdbc.Driver"); // MySQL 8+ 
+Connection conn = DriverManager.getConnection( 
+"jdbc:mysql://localhost:3306/login_db", "root", "Pass@123" 
+); 
+String sql = "SELECT password FROM users WHERE username = ?"; 
+PreparedStatement stmt = conn.prepareStatement(sql); 
+stmt.setString(1, username); 
+ResultSet rs = stmt.executeQuery(); 
+if (rs.next()) { 
+password = rs.getString("password"); 
+} 
+conn.close(); 
+} catch (Exception e) { 
+e.printStackTrace(); 
+}        return password; 
+}} 
+4) MySQL Script: 
+CREATE DATABASE IF NOT EXISTS login_db; 
+USE login_db; 
+CREATE TABLE IF NOT EXISTS users ( 
+id INT PRIMARY KEY AUTO_INCREMENT, 
+username VARCHAR(255) UNIQUE NOT NULL, 
+password VARCHAR(255) NOT NULL 
+); -- Insert sample user 
+INSERT INTO users (username, password) VALUES ('admin', 'admin123');
