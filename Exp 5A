@@ -1,0 +1,46 @@
+Exp 5A
+1) Adder.java 
+import java.rmi.*;  
+public interface Adder extends Remote  
+{  
+public int add(int x,int y)throws RemoteException;  
+}  
+2) AdderRemote.java 
+import java.rmi.*;  
+import java.rmi.server.*;  
+public class AdderRemote extends UnicastRemoteObject implements Adder  
+{  
+AdderRemote()throws RemoteException{  
+super();  
+}  
+public int add(int x,int y)  
+{  
+return x+y;  
+}  
+} 
+3) MyClient.java 
+import java.rmi.*;  
+public class MyClient{  
+public static void main(String args[])  
+{  
+try  
+{  
+Adder obj=(Adder)Naming.lookup("ADD");  
+int i = obj.add(34,4);  
+System.out.println("Addition is : "+ i);  
+}catch(Exception e){System.out.println(e);}  
+}  
+}  
+4) MyServer.java 
+import java.rmi.*;  
+import java.rmi.registry.*;  
+public class MyServer  
+{  
+public static void main(String args[])  
+{  
+try{  
+Adder obj=new AdderRemote();  
+Naming.rebind("ADD",obj);  
+System.out.println("Server Strarted");  
+}catch(Exception e){System.out.println(e);}  
+} }
